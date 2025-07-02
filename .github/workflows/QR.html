@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>QR GENERADOR</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      color: #000;
+    }
+
+    label, select, input, button {
+      margin-top: 1rem;
+      display: block;
+      width: 100%;
+    }
+
+    #imagenQR {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Fondo animado -->
+  <div id="vanta-bg"></div>
+
+  <header>
+    <h1>Generador de Código QR</h1>
+    <p>Elige el formato: JPEG o SVG</p>
+  </header>
+
+  <main>
+    <form onsubmit="event.preventDefault(); generarQR();">
+      <label for="texto">URL:</label>
+      <input type="text" id="texto" required placeholder="Escribe aquí...">
+
+      <label for="formato">Formato:</label>
+      <select id="formato">
+        <option value="jpeg">JPEG</option>
+        <option value="svg">SVG</option>
+      </select>
+
+      <button type="submit">Generar QR</button>
+    </form>
+
+    <section id="imagenQR" aria-live="polite"></section>
+  </main>
+
+  <footer>
+    <p>Generador QR basado en QRCodeJS</p>
+  </footer>
+
+  <!-- Librerías necesarias -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js"></script>
+  <script>
+    VANTA.WAVES({
+      el: "#vanta-bg",
+      color: 0x000000, // negro
+      backgroundColor: 0xffd700, // dorado
+      shininess: 50,
+      waveHeight: 20,
+      waveSpeed: 1,
+      zoom: 0.85
+    });
+  </script>
+
+  <!-- Librería QRCodeJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    function generarQR() {
+      const texto = document.getElementById("texto").value;
+      const formato = document.getElementById("formato").value;
+      const contenedor = document.getElementById("imagenQR");
+
+      contenedor.innerHTML = "";
+
+      if (texto.trim() === "") return;
+
+      const temp = document.createElement('div');
+      temp.style.display = 'none';
+      document.body.appendChild(temp);
+
+      const qr = new QRCode(temp, {
+        text: texto,
+        width: 600,
+        height: 600,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      setTimeout(() => {
+        if (formato === "jpeg") {
+          const canvas = temp.querySelector("canvas");
+          if (canvas) {
+            const dataURL = canvas.toDataURL("image/jpeg", 1.0);
+            const img = new Image();
+            img.src = dataURL;
+            img.alt = "Código QR en JPEG";
+            img.width = 300;
+
+            const enlace = document.createElement("a");
+            enlace.href = dataURL;
+            enlace.download = "codigoQR.jpg";
+            enlace.textContent = "Descargar QR en JPEG";
+
+            contenedor.appendChild(img);
+            contenedor.appendChild(enlace);
+          }
+        } else if (formato === "svg") {
+          const canvas = temp.querySelector("canvas");
+          const ctx = canvas.getContext("2d");
+
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">`;
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+              const index = (y * canvas.width + x) * 4;
+              const [r, g, b, a] = imageData.data.slice(index, index + 4);
+              if (a > 128) {
+                const color = `rgb(${r},${g},${b})`;
+                svg += `<rect x="${x}" y="${y}" width="1" height="1" fill="${color}"/>`;
+              }
+            }
+          }
+          svg += "</svg>";
+
+          const blob = new Blob([svg], { type: "image/svg+xml" });
+          const url = URL.createObjectURL(blob);
+
+          const img = new Image();
+          img.src = url;
+          img.alt = "Código QR en SVG";
+          img.width = 300;
+
+          const enlace = document.createElement("a");
+          enlace.href = url;
+          enlace.download = "codigoQR.svg";
+          enlace.textContent = "Descargar QR en SVG";
+
+          contenedor.appendChild(img);
+          contenedor.appendChild(enlace);
+        }
+
+        document.body.removeChild(temp);
+      }, 200);
+    }
+  </script>
+</body>
+</html>

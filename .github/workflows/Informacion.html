@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fondo Animado</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #000;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #vanta-bg {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      z-index: 0;
+    }
+
+    .home-button {
+      position: fixed;
+      bottom: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #ffffff;
+      color: black;
+      padding: 100px 500px;
+      border-radius: 80px;
+      font-weight: bold;
+      font-size: 100px;
+      text-decoration: none;
+      z-index: 1;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      gap: 122px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .home-button:hover {
+      background-color: #ffffff;
+      transform: translateX(-50%) scale(1.1);
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="vanta-bg"></div>
+
+  <a href="C:\Users\anton\Desktop\WEB 2025\Web.html" class="home-button">
+     Inicio
+  </a>
+
+  <!-- Vanta.js y Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.waves.min.js"></script>
+  <script>
+    VANTA.WAVES({
+      el: "#vanta-bg",
+      color: 0x000000,
+      backgroundColor: 0x000000,
+      shininess: 50,
+      waveHeight: 20,
+      waveSpeed: 1,
+      zoom: 0.85
+    })
+  </script>
+
+
+</body>
+</html>
